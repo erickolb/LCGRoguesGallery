@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-10-13
+
+- Start playing automatically when opening the slideshow.
+- Show a play icon and Play label while paused, or a pause icon and Pause label while playing.
+- Use double-arrow previous/next controls and a three-dot options button, with accessibility labels.
+
 ## 0.2.0 — 2026-10-13
 
 - Rename the import action to Load My Collection and update the sign-in instructions.

@@ -20,6 +20,7 @@ public class MainActivity extends Activity {
     private WebView league;
     private LinearLayout root, controls;
     private ImageView cover;
+    private Button playbackButton;
     private TextView caption, status;
     private final List<Cover> fullCollection = new ArrayList<>();
     private List<Cover> selected = new ArrayList<>(), collection = new ArrayList<>();
@@ -121,18 +122,37 @@ public class MainActivity extends Activity {
         cover.setContentDescription("Comic cover"); root.addView(cover,new LinearLayout.LayoutParams(-1,0,1));
         caption = new TextView(this); caption.setTextColor(Color.WHITE); caption.setGravity(Gravity.CENTER); root.addView(caption);
         controls = new LinearLayout(this); controls.setGravity(Gravity.CENTER);
-        controls.addView(button("‹",()->advance(-1)));
-        controls.addView(button("Play / Pause",()->{playing=!playing;handler.removeCallbacks(slideshow);if(playing)handler.postDelayed(slideshow,15000);}));
-        controls.addView(button("›",()->advance(1)));
-        controls.addView(button("Menu",this::menu)); root.addView(controls);
+        controls.addView(iconButton(R.drawable.ic_skip_previous,"Previous cover",()->advance(-1)),new LinearLayout.LayoutParams(0,-2,1));
+        playbackButton=button("",()->setPlaying(!playing));
+        playbackButton.setMinWidth(0);playbackButton.setMinimumWidth(0);
+        controls.addView(playbackButton,new LinearLayout.LayoutParams(0,-2,2));
+        controls.addView(iconButton(R.drawable.ic_skip_next,"Next cover",()->advance(1)),new LinearLayout.LayoutParams(0,-2,1));
+        controls.addView(iconButton(R.drawable.ic_more,"Options menu",this::menu),new LinearLayout.LayoutParams(0,-2,1)); root.addView(controls);
         cover.setOnClickListener(v->{ int visibility=controls.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE; controls.setVisibility(visibility); caption.setVisibility(visibility); });
         display();
+        setPlaying(true);
+    }
+    private Button iconButton(int drawable,String description,Runnable action){
+        Button button=button("",action);button.setMinWidth(0);button.setMinimumWidth(0);
+        button.setContentDescription(description);button.setTooltipText(description);
+        button.setCompoundDrawablesWithIntrinsicBounds(0,drawable,0,0);
+        return button;
+    }
+    private void setPlaying(boolean requested){
+        playing=requested && !collection.isEmpty();handler.removeCallbacks(slideshow);
+        if(playbackButton!=null){
+            playbackButton.setText(playing?"Pause":"Play");
+            playbackButton.setContentDescription(playing?"Pause slideshow":"Play slideshow");
+            playbackButton.setCompoundDrawablesWithIntrinsicBounds(playing?R.drawable.ic_pause:R.drawable.ic_play,0,0,0);
+            playbackButton.setEnabled(!collection.isEmpty());
+        }
+        if(playing)handler.postDelayed(slideshow,15000);
     }
     private void advance(int delta) { if(collection.size()>0) {index=(index+delta+collection.size())%collection.size();display();} }
     private void display() {
         int token=++generation;
         String imageAccount=account;
-        if(collection.isEmpty()){cover.setImageDrawable(null); caption.setText("No enabled covers. Open Menu to manage your collection.");return;} Cover item=collection.get(index);
+        if(collection.isEmpty()){setPlaying(false);cover.setImageDrawable(null); caption.setText("No enabled covers. Open Menu to manage your collection.");return;} Cover item=collection.get(index);
         caption.setText(item.title+" · "+(index+1)+" / "+collection.size());
         cover.setContentDescription(item.title); cover.setImageDrawable(null);
         images.execute(()->{
@@ -156,7 +176,7 @@ public class MainActivity extends Activity {
             handler.post(()->{if(token!=generation){if(loaded!=null)loaded.recycle();return;} cover.setImageBitmap(loaded);if(currentBitmap!=null)currentBitmap.recycle();currentBitmap=loaded;if(failure!=null){unavailable.add(item.id);select(CollectionSelection.ids(selected),true);Toast.makeText(this,"Skipped unavailable cover: "+item.title,Toast.LENGTH_SHORT).show();display();}});
         });
     }
-    private void stopPlayback(){playing=false;handler.removeCallbacks(slideshow);getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
+    private void stopPlayback(){setPlaying(false);getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
     private void acceptCollection(JSONObject result) throws JSONException {
         account=result.getString("accountId"); fullCollection.clear();unavailable.clear();
         JSONArray covers=result.getJSONArray("covers");
