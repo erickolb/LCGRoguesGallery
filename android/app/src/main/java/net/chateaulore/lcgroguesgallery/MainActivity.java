@@ -84,15 +84,22 @@ public class MainActivity extends Activity {
     }
     private void pollImport() {
         if (!importing) return;
-        league.evaluateJavascript("JSON.stringify(window.__roguesResult || null)", value -> {
+        league.evaluateJavascript("JSON.stringify(window.__roguesResult || {progress:window.__roguesProgress || 'Loading owned issues…'})", value -> {
             try {
                 Object decoded = new JSONTokener(value).nextValue();
                 if (!(decoded instanceof String) || "null".equals(decoded)) {
-                    if (++polls < 120) handler.postDelayed(this::pollImport,1000);
-                    else { importing=false; status.setText("League did not respond within two minutes. Try again."); }
+                    if (++polls < 600) handler.postDelayed(this::pollImport,1000);
+                    else { importing=false; status.setText("Collection loading timed out. Please try again."); }
                     return;
                 }
-                JSONObject result = new JSONObject((String)decoded); importing=false;
+                JSONObject result = new JSONObject((String)decoded);
+                if (result.has("progress")) {
+                    status.setText(result.getString("progress"));
+                    if (++polls < 600) handler.postDelayed(this::pollImport,1000);
+                    else { importing=false; status.setText("Collection loading timed out. Please try again."); }
+                    return;
+                }
+                importing=false;
                 if (result.has("error")) { status.setText(result.getString("error")); return; }
                 collection=result.getJSONArray("covers"); index=0; showGallery();
             } catch(Exception e) { importing=false; status.setText("Unable to read League's response. Try signing in again."); }
@@ -122,7 +129,10 @@ public class MainActivity extends Activity {
             if(token!=generation) return;
             Bitmap bitmap=null; String error=null;
             try {
-                URL url=new URL(item.getString("url"));
+                String[] candidates = item.has("fallbackUrl") ? new String[]{item.getString("url"),item.getString("fallbackUrl")} : new String[]{item.getString("url")};
+                for (int candidate=0;candidate<candidates.length;candidate++) {
+                  try {
+                URL url=new URL(candidates[candidate]);
                 if(!"https".equals(url.getProtocol())) throw new IOException();
                 HttpURLConnection connection=(HttpURLConnection)url.openConnection();
                 connection.setConnectTimeout(15000);connection.setReadTimeout(15000);connection.setInstanceFollowRedirects(false);
@@ -138,6 +148,9 @@ public class MainActivity extends Activity {
                     while(bounds.outWidth/options.inSampleSize>2400 || bounds.outHeight/options.inSampleSize>2400) options.inSampleSize*=2;
                     bitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.length,options);if(bitmap==null)throw new IOException();
                 } finally {connection.disconnect();}
+                    break;
+                  } catch(Exception failure) { if(candidate==candidates.length-1) throw failure; }
+                }
             }catch(Exception e){error="Cover unavailable. Use Next to continue.";}
             Bitmap loaded=bitmap;String failure=error;
             handler.post(()->{if(token!=generation){if(loaded!=null)loaded.recycle();return;} cover.setImageBitmap(loaded);if(currentBitmap!=null)currentBitmap.recycle();currentBitmap=loaded;if(failure!=null)caption.setText(failure);});
