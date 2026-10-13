@@ -1,0 +1,9 @@
+.gradle/
+**/build/
+local.properties
+work/
+outputs/
+node_modules/
+*.jks
+*.keystore
+.idea/
