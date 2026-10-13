@@ -1,6 +1,7 @@
 package net.chateaulore.lcgroguesgallery;
 
 import android.app.*;
+import android.animation.*;
 import android.os.*;
 import android.graphics.*;
 import android.net.Uri;
@@ -20,6 +21,8 @@ public class MainActivity extends Activity {
     private WebView league;
     private LinearLayout root, controls;
     private ImageView cover;
+    private ImageView previousCover;
+    private AnimatorSet transition;
     private Button playbackButton;
     private TextView caption, status;
     private final List<Cover> fullCollection = new ArrayList<>();
@@ -32,9 +35,9 @@ public class MainActivity extends Activity {
     private boolean managing;
     private int index, polls;
     private volatile int generation;
-    private boolean playing, importing;
+    private boolean playing, importing, loadingCover;
     private Bitmap currentBitmap;
-    private final Runnable slideshow = new Runnable() { public void run() { if (playing) { advance(1); handler.postDelayed(this,15000); } } };
+    private final Runnable slideshow = ()->{if(playing)advance(1);};
     @Override public void onCreate(Bundle state) { super.onCreate(state); preferences=new GalleryPreferences(getSharedPreferences("gallery",MODE_PRIVATE)); cache=new CoverCache(new File(getCacheDir(),"covers")); createWebView(); showLogin(); if(Build.VERSION.SDK_INT>=33) ModernBack.register(this,this::handleBack); }
     @android.annotation.TargetApi(33)
     private static class ModernBack {
@@ -118,16 +121,23 @@ public class MainActivity extends Activity {
     private void showGallery() {
         stopPlayback(); generation++; managing=false; base(); getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().getDecorView().setSystemUiVisibility(5894);
+        FrameLayout artwork=new FrameLayout(this);
+        previousCover=new ImageView(this);previousCover.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        previousCover.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        artwork.addView(previousCover,new FrameLayout.LayoutParams(-1,-1));
         cover = new ImageView(this); cover.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        cover.setContentDescription("Comic cover"); root.addView(cover,new LinearLayout.LayoutParams(-1,0,1));
+        cover.setContentDescription("Comic cover");artwork.addView(cover,new FrameLayout.LayoutParams(-1,-1));
+        root.addView(artwork,new LinearLayout.LayoutParams(-1,0,1));
         caption = new TextView(this); caption.setTextColor(Color.WHITE); caption.setGravity(Gravity.CENTER); root.addView(caption);
         controls = new LinearLayout(this); controls.setGravity(Gravity.CENTER);
-        controls.addView(iconButton(R.drawable.ic_skip_previous,"Previous cover",()->advance(-1)),new LinearLayout.LayoutParams(0,-2,1));
+        controls.addView(iconButton(R.drawable.ic_skip_previous,"Previous cover",()->advance(-1)),new LinearLayout.LayoutParams(dp(56),dp(56)));
         playbackButton=button("",()->setPlaying(!playing));
         playbackButton.setMinWidth(0);playbackButton.setMinimumWidth(0);
-        controls.addView(playbackButton,new LinearLayout.LayoutParams(0,-2,2));
-        controls.addView(iconButton(R.drawable.ic_skip_next,"Next cover",()->advance(1)),new LinearLayout.LayoutParams(0,-2,1));
-        controls.addView(iconButton(R.drawable.ic_more,"Options menu",this::menu),new LinearLayout.LayoutParams(0,-2,1)); root.addView(controls);
+        playbackButton.setGravity(Gravity.CENTER);playbackButton.setPadding(dp(8),0,dp(8),0);playbackButton.setCompoundDrawablePadding(dp(4));
+        controls.addView(playbackButton,new LinearLayout.LayoutParams(dp(116),dp(56)));
+        controls.addView(iconButton(R.drawable.ic_skip_next,"Next cover",()->advance(1)),new LinearLayout.LayoutParams(dp(56),dp(56)));
+        controls.addView(iconButton(R.drawable.ic_more,"Options menu",this::menu),new LinearLayout.LayoutParams(dp(56),dp(56)));
+        LinearLayout.LayoutParams controlRow=new LinearLayout.LayoutParams(-2,dp(56));controlRow.gravity=Gravity.CENTER_HORIZONTAL;root.addView(controls,controlRow);
         cover.setOnClickListener(v->{ int visibility=controls.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE; controls.setVisibility(visibility); caption.setVisibility(visibility); });
         display();
         setPlaying(true);
@@ -135,9 +145,14 @@ public class MainActivity extends Activity {
     private Button iconButton(int drawable,String description,Runnable action){
         Button button=button("",action);button.setMinWidth(0);button.setMinimumWidth(0);
         button.setContentDescription(description);button.setTooltipText(description);
-        button.setCompoundDrawablesWithIntrinsicBounds(0,drawable,0,0);
+        button.setGravity(Gravity.CENTER);button.setPadding(0,0,0,0);
+        button.setCompoundDrawablesWithIntrinsicBounds(drawable,0,0,0);
+        button.setPadding(dp(16),0,dp(16),0);
         return button;
     }
+    private int dp(int value){return Math.round(value*getResources().getDisplayMetrics().density);}
+    private boolean inGallery(){return !managing && cover!=null && cover.getParent()!=null && cover.getParent().getParent()==root;}
+    private void scheduleRotation(){handler.removeCallbacks(slideshow);if(playing && !loadingCover)handler.postDelayed(slideshow,preferences.rotationSeconds*1000L);}
     private void setPlaying(boolean requested){
         playing=requested && !collection.isEmpty();handler.removeCallbacks(slideshow);
         if(playbackButton!=null){
@@ -146,15 +161,16 @@ public class MainActivity extends Activity {
             playbackButton.setCompoundDrawablesWithIntrinsicBounds(playing?R.drawable.ic_pause:R.drawable.ic_play,0,0,0);
             playbackButton.setEnabled(!collection.isEmpty());
         }
-        if(playing)handler.postDelayed(slideshow,15000);
+        scheduleRotation();
     }
     private void advance(int delta) { if(collection.size()>0) {index=(index+delta+collection.size())%collection.size();display();} }
     private void display() {
         int token=++generation;
+        handler.removeCallbacks(slideshow);loadingCover=!collection.isEmpty();
         String imageAccount=account;
         if(collection.isEmpty()){setPlaying(false);cover.setImageDrawable(null); caption.setText("No enabled covers. Open Menu to manage your collection.");return;} Cover item=collection.get(index);
         caption.setText(item.title+" · "+(index+1)+" / "+collection.size());
-        cover.setContentDescription(item.title); cover.setImageDrawable(null);
+        cover.setContentDescription(item.title);
         images.execute(()->{
             if(token!=generation) return;
             Bitmap bitmap=null; String error=null;
@@ -173,10 +189,23 @@ public class MainActivity extends Activity {
                 }
             }catch(Exception e){error="Cover unavailable. Use Next to continue.";}
             Bitmap loaded=bitmap;String failure=error;
-            handler.post(()->{if(token!=generation){if(loaded!=null)loaded.recycle();return;} cover.setImageBitmap(loaded);if(currentBitmap!=null)currentBitmap.recycle();currentBitmap=loaded;if(failure!=null){unavailable.add(item.id);select(CollectionSelection.ids(selected),true);Toast.makeText(this,"Skipped unavailable cover: "+item.title,Toast.LENGTH_SHORT).show();display();}});
+            handler.post(()->{if(token!=generation){if(loaded!=null)loaded.recycle();return;}if(failure!=null){unavailable.add(item.id);select(CollectionSelection.ids(selected),true);Toast.makeText(this,"Skipped unavailable cover: "+item.title,Toast.LENGTH_SHORT).show();display();}else{loadingCover=false;showCover(loaded);scheduleRotation();}});
         });
     }
-    private void stopPlayback(){setPlaying(false);getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
+    private void finishTransition(){if(transition!=null){transition.cancel();transition=null;}if(cover!=null)cover.setAlpha(1f);}
+    private void showCover(Bitmap loaded){
+        finishTransition();Bitmap outgoing=currentBitmap;currentBitmap=loaded;
+        cover.setImageBitmap(loaded);
+        if(preferences.crossFade && outgoing!=null){
+            previousCover.setImageBitmap(outgoing);previousCover.setAlpha(1f);cover.setAlpha(0f);
+            AnimatorSet animation=new AnimatorSet();transition=animation;
+            animation.playTogether(ObjectAnimator.ofFloat(cover,"alpha",0f,1f),ObjectAnimator.ofFloat(previousCover,"alpha",1f,0f));
+            animation.setDuration(600);animation.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
+            animation.addListener(new AnimatorListenerAdapter(){@Override public void onAnimationEnd(Animator animator){previousCover.setImageDrawable(null);outgoing.recycle();if(transition==animation)transition=null;}});
+            animation.start();
+        }else if(outgoing!=null)outgoing.recycle();
+    }
+    private void stopPlayback(){setPlaying(false);finishTransition();getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
     private void acceptCollection(JSONObject result) throws JSONException {
         account=result.getString("accountId"); fullCollection.clear();unavailable.clear();
         JSONArray covers=result.getJSONArray("covers");
@@ -225,6 +254,9 @@ public class MainActivity extends Activity {
         Switch remember=new Switch(this);remember.setText("Keep the same selection between sessions");remember.setChecked(preferences.rememberSelection);content.addView(remember);
         TextView persistence=new TextView(this);persistence.setText("Default: choose afresh each session. Keeping a selection fills gaps if comics are removed or excluded.");content.addView(persistence);
         Switch randomDisplay=new Switch(this);randomDisplay.setText("Random slideshow order (off: LCG order)");randomDisplay.setChecked(preferences.randomDisplay);content.addView(randomDisplay);
+        TextView delayLabel=new TextView(this);delayLabel.setText("Seconds between covers (3–600)");content.addView(delayLabel);
+        EditText delay=new EditText(this);delay.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);delay.setText(String.valueOf(preferences.rotationSeconds));content.addView(delay);
+        Switch crossFade=new Switch(this);crossFade.setText("Cross-fade between covers (off: smash cut)");crossFade.setChecked(preferences.crossFade);content.addView(crossFade);
         Button manage=button("Manage collection",()->{manageCollection();});manage.setEnabled(!account.isEmpty());content.addView(manage);
         content.addView(button("Clear cached covers",()->images.execute(()->{cache.clear();handler.post(()->Toast.makeText(this,"Cached covers cleared",Toast.LENGTH_SHORT).show());})));
         ScrollView scroll=new ScrollView(this);scroll.addView(content);
@@ -232,10 +264,12 @@ public class MainActivity extends Activity {
         manage.setOnClickListener(v->{dialog.dismiss();manageCollection();});
         dialog.setOnShowListener(ignored->dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{
             int limit;try{limit=Integer.parseInt(maximum.getText().toString());if(limit<1)throw new NumberFormatException();}catch(NumberFormatException e){maximum.setError("Enter a positive whole number");return;}
+            int seconds;try{seconds=Integer.parseInt(delay.getText().toString());if(seconds<3 || seconds>600)throw new NumberFormatException();}catch(NumberFormatException e){delay.setError("Enter a whole number from 3 to 600");return;}
+            preferences.rotationSeconds=seconds;preferences.crossFade=crossFade.isChecked();
             boolean reselect=limit!=preferences.maximum || randomSelection.isChecked()!=preferences.randomSelection;
             preferences.maximum=limit;preferences.randomSelection=randomSelection.isChecked();preferences.rememberSelection=remember.isChecked();preferences.randomDisplay=randomDisplay.isChecked();preferences.save();
             if(!account.isEmpty()){if(reselect)select(CollectionSelection.ids(selected),preferences.rememberSelection);else{preferences.selected(account,selected);collection=CollectionSelection.displayOrder(selected,preferences.randomDisplay,new Random());index=0;}}
-            dialog.dismiss();if(!account.isEmpty() && !managing && cover!=null && cover.getParent()==root)showGallery();
+            dialog.dismiss();if(!account.isEmpty() && inGallery())showGallery();
         }));dialog.show();
     }
     private void manageCollection(){
@@ -268,11 +302,11 @@ public class MainActivity extends Activity {
     }    private void credits(){String license="";try(InputStream in=getAssets().open("leagueofcomicgeeks-LICENSE.txt")){license=new String(readBytes(in),java.nio.charset.StandardCharsets.UTF_8);}catch(IOException ignored){}
         TextView t=new TextView(this);t.setPadding(28,20,28,20);t.setText(android.text.Html.fromHtml("<h2>Credits</h2><p><a href=\"https://www.flaticon.com/free-icons/comic-book\" title=\"comic-book icons\">Comic-book icons created by Magnific - Flaticon</a></p><p>Collection adapter based on <a href=\"https://github.com/alistairjcbrown/leagueofcomicgeeks\">leagueofcomicgeeks by Alistair Brown</a> (MIT).</p><p>Unofficial app. League of Comic Geeks and cover artwork belong to their respective owners.</p>",0));t.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
         ScrollView scroll=new ScrollView(this);LinearLayout content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.addView(t);TextView l=new TextView(this);l.setPadding(28,0,28,20);l.setText(license);content.addView(l);scroll.addView(content);new AlertDialog.Builder(this).setView(scroll).setPositiveButton("Close",null).show();}
-    private void handleBack(){if(managing){select(CollectionSelection.ids(selected),true);showGallery();}else if(cover!=null && cover.getParent()==root)menu();else if(league.canGoBack())league.goBack();else finish();}
+    private void handleBack(){if(managing){select(CollectionSelection.ids(selected),true);showGallery();}else if(inGallery())menu();else if(league.canGoBack())league.goBack();else finish();}
     // API 33+ uses ModernBack; this callback supports Android 8 through 12.
     @android.annotation.SuppressLint("GestureBackNavigation")
     @Override public void onBackPressed(){handleBack();}
     @Override protected void onPause(){super.onPause();stopPlayback();CookieManager.getInstance().flush();}
-    @Override protected void onResume(){super.onResume();if(cover!=null && cover.getParent()==root){getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(5894);}}
-    @Override protected void onDestroy(){generation++;importing=false;handler.removeCallbacksAndMessages(null);images.shutdownNow();league.destroy();super.onDestroy();}
+    @Override protected void onResume(){super.onResume();if(inGallery()){getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(5894);}}
+    @Override protected void onDestroy(){generation++;importing=false;finishTransition();handler.removeCallbacksAndMessages(null);images.shutdownNow();league.destroy();super.onDestroy();}
 }

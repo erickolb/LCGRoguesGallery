@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2 — 2026-10-13
+
+- Configure the slideshow delay from 3 to 600 seconds (default 15 seconds).
+- Cross-fade covers by default, with a setting for instant smash cuts.
+- Keep the current cover visible while the next image loads.
+- Center a compact control row with consistent 56dp button heights.
+
 ## 0.2.1 — 2026-10-13
 
 - Start playing automatically when opening the slideshow.

@@ -17,6 +17,8 @@ The app lists the full Have It collection before choosing covers. The maximum de
 
 Each new session chooses a fresh selection by default. Enable **Keep the same selection between sessions** to retain eligible issue/variant references and fill gaps when comics are removed or excluded. Exclusions and saved selections are separated by LCG account. Refreshing the collection also makes a fresh selection when persistence is off.
 
+Settings also controls the delay between covers: **3–600 seconds**, default **15**. **Cross-fade between covers** defaults on; turn it off for an instant smash cut. The current cover stays visible while the next loads. Slideshow controls form a compact, centered row with matching button heights.
+
 In the cover Menu, **Exclude this cover** removes it and fills the open slot. **Manage collection** lists the full imported collection without downloading extra covers. Check or uncheck issues to enable or exclude them, then tap Done. Enabled issues remain subject to the configured maximum.
 
 Images are downloaded only as displayed and cached privately, with a 256 MiB / 1000-file bound. Settings includes **Clear cached covers**. The app saves settings, exclusion references, and optional selected issue references locally, and League retains its browser session cookies. It does not read, retain, or share your LCG password. See the full [Data Use / Privacy Policy](docs/privacy.html), also available from the app's top bar and slideshow menu.

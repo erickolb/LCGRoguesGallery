@@ -13,6 +13,8 @@ final class GalleryPreferences {
     boolean randomSelection;
     boolean rememberSelection;
     boolean randomDisplay;
+    int rotationSeconds;
+    boolean crossFade;
 
     GalleryPreferences(SharedPreferences preferences) {
         this.preferences = preferences;
@@ -20,12 +22,15 @@ final class GalleryPreferences {
         randomSelection = preferences.getBoolean("randomSelection", true);
         rememberSelection = preferences.getBoolean("rememberSelection", false);
         randomDisplay = preferences.getBoolean("randomDisplay", true);
+        rotationSeconds = Math.max(3, Math.min(600, preferences.getInt("rotationSeconds", 15)));
+        crossFade = preferences.getBoolean("crossFade", true);
     }
 
     void save() {
         SharedPreferences.Editor editor = preferences.edit()
             .putInt("maximum", maximum).putBoolean("randomSelection", randomSelection)
-            .putBoolean("rememberSelection", rememberSelection).putBoolean("randomDisplay", randomDisplay);
+            .putBoolean("rememberSelection", rememberSelection).putBoolean("randomDisplay", randomDisplay)
+            .putInt("rotationSeconds", rotationSeconds).putBoolean("crossFade", crossFade);
         if (!rememberSelection) {
             for (String key : preferences.getAll().keySet()) if (key.startsWith("selection.")) editor.remove(key);
         }
