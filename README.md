@@ -1,6 +1,6 @@
 # LCG Rogues Gallery
 
-An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. App label: **LCG Rogues Gallery**; repository: `LCGRoguesGallery`.
+An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `LCGRoguesGallery`.
 
 ## Use
 
