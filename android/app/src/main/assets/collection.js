@@ -18,8 +18,8 @@
       const doc = new DOMParser().parseFromString(data.list, 'text/html');
       const rows = doc.querySelectorAll('li');
       for (const row of rows) {
-        const anchor = row.querySelector('.comic-title a');
-        const img = row.querySelector('.comic-cover-art img');
+        const anchor = row.querySelector('.comic-title a, .title a');
+        const img = row.querySelector('.comic-cover-art img, .cover img');
         if (!anchor || !img) continue;
         const raw = img.getAttribute('data-original') || img.getAttribute('data-src') || img.getAttribute('src');
         if (!raw || raw.includes('no-cover')) continue;

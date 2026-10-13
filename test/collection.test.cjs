@@ -34,3 +34,16 @@ test('skips missing covers and rejects insecure images',async()=>{
   const {result}=await run([{list:row(1,'','/no-cover.jpg')+row(2,'','http://cdn.example/cover.jpg')}]);
   assert.match(result.error,/No cover images/);
 });
+test('reads the current League markup observed on its live site',async()=>{
+  const html=fs.readFileSync('test/fixtures/league-live-issue.html','utf8');
+  const {result}=await run([{list:html}]);
+  assert.equal(result.covers.length,1);
+  assert.equal(result.covers[0].title,'The Amazing Spider-Man #1001');
+  assert.equal(result.covers[0].url,'https://s3.amazonaws.com/comicgeeks/comics/covers/medium-3191578.jpg?1791486274');
+});
+test('reads current lazy-loaded covers before the browser has loaded them',async()=>{
+  const html='<li class="issue"><div class="cover"><a href="/comic/1/example"><img src="/placeholder.svg" data-src="https://cdn.example/owned.jpg"></a></div><div class="title"><a href="/comic/1/example">Owned #1</a></div></li>';
+  const {result}=await run([{list:html}]);
+  assert.equal(result.covers.length,1);
+  assert.equal(result.covers[0].url,'https://cdn.example/owned.jpg');
+});
