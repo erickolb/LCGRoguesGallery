@@ -1,0 +1,3 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:width="54dp" android:height="54dp" android:gravity="center"><bitmap android:src="@drawable/comic_book" android:gravity="fill" /></item>
+</layer-list>
