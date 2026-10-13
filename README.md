@@ -35,7 +35,7 @@ Debug APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Debug signing is
 
 <a href="https://www.flaticon.com/free-icons/comic-book" title="comic-book icons">Comic-book icons created by Magnific - Flaticon</a>
 
-The supplied icon is centered at 75% of Android's 72dp launcher viewport (54dp inside the 108dp adaptive foreground canvas) on plum `#59324F`.
+The supplied icon is centered at 75% of Android's 72dp launcher viewport (54dp inside the 108dp adaptive foreground canvas) on LCG navy `#101F3E`.
 
 Collection adapter based on [leagueofcomicgeeks by Alistair Brown](https://github.com/alistairjcbrown/leagueofcomicgeeks), copyright 2017 Alistair Brown, MIT license. The full upstream license is bundled in the app and shown in Credits.
 
