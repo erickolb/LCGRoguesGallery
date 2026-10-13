@@ -5,11 +5,21 @@ An experimental Android cover gallery for comics marked **Have It** in League of
 ## Use
 
 1. Sign in on League's own HTTPS page inside the app.
-2. Navigate to your own profile collection, then tap **Load Have It**.
+2. Navigate to your own profile collection, then tap **Load My Collection**.
 3. Wait for the owned-issue import. Collections grouped by series are expanded into their individual owned issues, with progress shown while loading.
 4. Use Previous/Next or Play/Pause (15 seconds per cover). Tap the cover to hide or show controls. Menu includes refresh, credits, and sign out.
 
-Passwords are entered directly into League's WebView; the app does not read or store passwords. League session cookies remain in Android's private WebView storage until sign out. Imported titles and image URLs remain in memory; no server or Docker container is required. Android backup is disabled. Covers require internet access. Rotation preserves the current gallery; process termination requires reloading it.
+Passwords are entered directly into League's WebView; the app does not read or store passwords. League session cookies remain in Android's private WebView storage until sign out. Imported titles and image URLs remain in memory; no server or Docker container is required. Android backup is disabled. Uncached covers require internet access; previously viewed covers can use the private device cache. Rotation preserves the current gallery; process termination requires reloading it.
+
+## Version 0.2.0 settings and privacy
+
+The app lists the full Have It collection before choosing covers. The maximum defaults to **1000** and accepts any positive whole number. Selection defaults to random; turn it off for LCG's listed order. Slideshow order is a separate random/sequential setting.
+
+Each new session chooses a fresh selection by default. Enable **Keep the same selection between sessions** to retain eligible issue/variant references and fill gaps when comics are removed or excluded. Exclusions and saved selections are separated by LCG account. Refreshing the collection also makes a fresh selection when persistence is off.
+
+In the cover Menu, **Exclude this cover** removes it and fills the open slot. **Manage collection** lists the full imported collection without downloading extra covers. Check or uncheck issues to enable or exclude them, then tap Done. Enabled issues remain subject to the configured maximum.
+
+Images are downloaded only as displayed and cached privately, with a 256 MiB / 1000-file bound. Settings includes **Clear cached covers**. The app saves settings, exclusion references, and optional selected issue references locally, and League retains its browser session cookies. It does not read, retain, or share your LCG password. See the full [Data Use / Privacy Policy](docs/privacy.html), also available from the app's top bar and slideshow menu.
 
 ## Integration status
 
@@ -17,7 +27,7 @@ This is an **experimental integration**, not an official League API client. The 
 
 League cover thumbnails are promoted to their `large-` image URLs, preserving the variant filename and query string. If a larger image is unavailable, the viewer falls back to its original thumbnail. A sampled League cover was 170×259 pixels as a thumbnail and 600×911 pixels in the large version; dimensions depend on the source artwork.
 
-Selectors and collection grouping were checked against live public pages. Regression tests cover a 51-series / 188-issue collection, variants, image URL selection, and pagination. Pagination follows recognized next links or page counts; unsupported changes may require adapter updates. The updated importer still needs confirmation in the signed-in Android session. Missing cover images are skipped.
+Selectors and collection grouping were checked against live public pages. Regression tests cover a 51-series / 188-issue collection, variants, image URL selection, and pagination. Pagination follows recognized next links or page counts; unsupported changes may require adapter updates. The 0.1.4 importer was confirmed in the signed-in Android session. Missing cover images are skipped.
 
 The upstream `leagueofcomicgeeks` package is Node.js-specific, so it is **not a runtime dependency** of this Android application. Its collection approach is adapted into a browser script. Its old login scraping depends on UserVoice identification markup; this app instead uses League's own login. Cloudflare may reject embedded browsers; this app does not bypass challenges. If login is blocked, an approved integration or export import will be needed.
 

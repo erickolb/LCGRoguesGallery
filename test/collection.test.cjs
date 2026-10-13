@@ -14,6 +14,8 @@ async function run(responses,html='user_id: 42') {
 test('requests owned issues and preserves distinct variants',async()=>{
   const {result,calls}=await run([{list:row(1)+row(1,'?variant=2')+row(1)+row(3,'','https://cdn.example/cover.jpg')}]);
   assert.equal(result.covers.length,3);
+  assert.equal(result.accountId,'42');
+  assert.deepEqual(Array.from(result.covers,c=>c.id),['1:','1:2','3:']);
   const query=new URL(calls[0],'https://leagueofcomicgeeks.com').searchParams;
   assert.equal(query.get('list'),'2'); assert.equal(query.get('list_option'),'issue'); assert.equal(query.get('user_id'),'42');
   assert.equal(result.covers[2].url,'https://cdn.example/cover.jpg');

@@ -45,7 +45,7 @@
         const key = issueMatch[1] + ':' + (link.searchParams.get('variant') || '');
         if (!seenIssues.has(key)) {
           seenIssues.add(key);
-          const item = {title:anchor.textContent.trim(),url:url.href};
+          const item = {id:key,title:anchor.textContent.trim(),url:url.href};
           if (url.href !== fallbackUrl) item.fallbackUrl = fallbackUrl;
           covers.push(item);
         }
@@ -96,6 +96,6 @@
       finishedSeries++;
     }
     if (!covers.length) throw new Error('No owned issue covers were returned. Open your collection and try again.');
-    window.__roguesResult = {covers};
+    window.__roguesResult = {accountId:idMatch[1],covers};
   } catch (error) { window.__roguesResult = {error: error.message || 'Collection request failed.'}; }
 })();
