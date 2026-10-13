@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3 — 2026-10-13
+
+- Open the slideshow with title and controls hidden for a full-size presentation.
+- Tap the cover to show or hide a translucent title/control overlay without resizing the image.
+- Keep the overlay visible when no covers are enabled so collection options remain accessible.
+
 ## 0.2.2 — 2026-10-13
 
 - Configure the slideshow delay from 3 to 600 seconds (default 15 seconds).

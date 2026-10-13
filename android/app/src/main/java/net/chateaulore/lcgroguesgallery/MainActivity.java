@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService images = Executors.newSingleThreadExecutor();
     private WebView league;
-    private LinearLayout root, controls;
+    private LinearLayout root, controls, galleryOverlay;
     private ImageView cover;
     private ImageView previousCover;
     private AnimatorSet transition;
@@ -128,7 +128,10 @@ public class MainActivity extends Activity {
         cover = new ImageView(this); cover.setScaleType(ImageView.ScaleType.FIT_CENTER);
         cover.setContentDescription("Comic cover");artwork.addView(cover,new FrameLayout.LayoutParams(-1,-1));
         root.addView(artwork,new LinearLayout.LayoutParams(-1,0,1));
-        caption = new TextView(this); caption.setTextColor(Color.WHITE); caption.setGravity(Gravity.CENTER); root.addView(caption);
+        galleryOverlay=new LinearLayout(this);galleryOverlay.setOrientation(LinearLayout.VERTICAL);
+        galleryOverlay.setBackgroundColor(Color.argb(190,16,20,28));galleryOverlay.setPadding(dp(12),dp(12),dp(12),dp(8));
+        galleryOverlay.setClickable(true);
+        caption = new TextView(this); caption.setTextColor(Color.WHITE); caption.setGravity(Gravity.CENTER);galleryOverlay.addView(caption);
         controls = new LinearLayout(this); controls.setGravity(Gravity.CENTER);
         controls.addView(iconButton(R.drawable.ic_skip_previous,"Previous cover",()->advance(-1)),new LinearLayout.LayoutParams(dp(56),dp(56)));
         playbackButton=button("",()->setPlaying(!playing));
@@ -137,8 +140,11 @@ public class MainActivity extends Activity {
         controls.addView(playbackButton,new LinearLayout.LayoutParams(dp(116),dp(56)));
         controls.addView(iconButton(R.drawable.ic_skip_next,"Next cover",()->advance(1)),new LinearLayout.LayoutParams(dp(56),dp(56)));
         controls.addView(iconButton(R.drawable.ic_more,"Options menu",this::menu),new LinearLayout.LayoutParams(dp(56),dp(56)));
-        LinearLayout.LayoutParams controlRow=new LinearLayout.LayoutParams(-2,dp(56));controlRow.gravity=Gravity.CENTER_HORIZONTAL;root.addView(controls,controlRow);
-        cover.setOnClickListener(v->{ int visibility=controls.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE; controls.setVisibility(visibility); caption.setVisibility(visibility); });
+        LinearLayout.LayoutParams controlRow=new LinearLayout.LayoutParams(-2,dp(56));controlRow.gravity=Gravity.CENTER_HORIZONTAL;galleryOverlay.addView(controls,controlRow);
+        FrameLayout.LayoutParams overlayPosition=new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM);
+        artwork.addView(galleryOverlay,overlayPosition);
+        galleryOverlay.setVisibility(View.GONE);
+        cover.setOnClickListener(v->galleryOverlay.setVisibility(galleryOverlay.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE));
         display();
         setPlaying(true);
     }
@@ -168,7 +174,7 @@ public class MainActivity extends Activity {
         int token=++generation;
         handler.removeCallbacks(slideshow);loadingCover=!collection.isEmpty();
         String imageAccount=account;
-        if(collection.isEmpty()){setPlaying(false);cover.setImageDrawable(null); caption.setText("No enabled covers. Open Menu to manage your collection.");return;} Cover item=collection.get(index);
+        if(collection.isEmpty()){setPlaying(false);cover.setImageDrawable(null); caption.setText("No enabled covers. Open Menu to manage your collection.");galleryOverlay.setVisibility(View.VISIBLE);return;} Cover item=collection.get(index);
         caption.setText(item.title+" · "+(index+1)+" / "+collection.size());
         cover.setContentDescription(item.title);
         images.execute(()->{
