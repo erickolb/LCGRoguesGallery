@@ -2,7 +2,7 @@
 
 An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `RoguesGallery`.
 
-Current release candidate: **1.0-rc1**, based on the approved 0.2.3 build.
+Current release: **1.0**. [Download the signed APK](https://github.com/erickolb/RoguesGallery/releases/latest/download/RoguesGallery.apk).
 
 ## Use
 

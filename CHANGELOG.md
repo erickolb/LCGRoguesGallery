@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.0 — 2026-10-13
+
+- First public release of Rogues Gallery for Android 8.0 and newer.
+- Display individual Have It issue covers and variants in a full-size slideshow with floating controls.
+- Configure cover selection, saved selections, exclusions, playback order, 3–600 second timing, and optional cross-fades.
+- Cache covers privately and provide an in-app privacy policy.
 
 - Add automated signed APK/App Bundle builds with certificate checks and checksums; matching version tags publish releases, while manual runs only save artifacts.
 

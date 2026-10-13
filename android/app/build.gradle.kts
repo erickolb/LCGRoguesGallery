@@ -6,8 +6,8 @@ android {
         applicationId = "net.chateaulore.roguesgallery"
         minSdk = 26
         targetSdk = 37
-        versionCode = 10
-        versionName = "1.0-rc1"
+        versionCode = 11
+        versionName = "1.0"
     }
     val releaseKeystore = providers.environmentVariable("ANDROID_KEYSTORE_PATH").orNull
     if (!releaseKeystore.isNullOrBlank()) {
