@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101f3e">
   <meta name="description" content="Rogues Gallery brings your League of Comic Geeks collection to an Android cover slideshow. Full-screen artwork, flexible playback, and a collection you can make your own.">
-  <title>LCG Rogues Gallery — Your comic collection, on display.</title>
+  <title>Rogues Gallery — Your comic collection, on display.</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css"><script src="screenshots.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -19,7 +19,7 @@
     <section class="hero wrap" aria-labelledby="intro">
       <div class="hero-copy">
         <p class="eyebrow"><span class="dot"></span> A gallery for your comic collection</p>
-        <h1 id="intro">LCG<br>Rogues Gallery</h1>
+        <h1 id="intro">Rogues Gallery</h1>
         <p class="hero-description">Your comics belong on display.<br>Even when they live in boxes.</p>
         <p class="intro">Bring the covers of your League of Comic Geeks collection to an Android phone or tablet. Sign in, load your collection, and let the artwork fill the screen.</p>
         <div class="button-row"><a class="button" href="#install">Follow the release <span aria-hidden="true">↓</span></a><a class="button secondary" href="#screenshots">Explore the app <span aria-hidden="true">↓</span></a></div>
@@ -27,7 +27,7 @@
         <span class="release-badge">In development · Public release coming soon</span>
       </div>
       <figure class="hero-preview">
-        <div class="preview-frame"><div class="screenshot-placeholder hero-placeholder"><img class="placeholder-icon" src="comic-book.png" width="88" height="88" alt=""><span class="placeholder-tag">Screenshot placeholder</span><span class="placeholder-title">Your gallery, at full size.</span><p class="placeholder-note">A tablet slideshow screenshot will appear here before release.</p></div></div>
+        <img class="at-home-photo" src="assets/rogues-gallery-at-home.jpg" alt="An Android tablet displaying a Monstress cover beside comic books and storage boxes" fetchpriority="high">
         <figcaption class="preview-caption"><span>THE ARTWORK TAKES THE SCREEN</span><span>01 / ROGUES GALLERY</span></figcaption>
       </figure>
     </section>
@@ -35,7 +35,7 @@
       <article><span class="number">01 / DISPLAY</span><h2>Give every cover its moment.</h2><p>A full-screen slideshow starts playing as soon as your collection loads. Tap a cover to reveal its title and floating controls without shrinking the artwork.</p></article>
       <article><span class="number">02 / SET THE PACE</span><h2>A rhythm of your own.</h2><p>Choose a delay from 3 seconds to 10 minutes. Smooth cross-fades are on by default, or switch to instant cuts. Play covers at random or in League’s listed order.</p></article>
       <article><span class="number">03 / CURATE</span><h2>Your collection. Your selection.</h2><p>List your full Have It collection, then choose up to 1,000 covers by default. Adjust the limit, choose randomly or in order, and optionally keep the same selection between sessions.</p></article>
-      <article><span class="number">04 / MAKE ROOM</span><h2>Keep the covers you want to see.</h2><p>Exclude a cover from its options menu, or check and uncheck issues in the collection list. Your exclusions stay on your device, separate from what you own on League.</p></article>
+      <article><span class="number">04 / MAKE ROOM</span><h2>Exclude the covers you don't want to show.</h2><p>Curate your gallery. Exclude a cover from its options menu, or check and uncheck issues in the collection list. Your exclusions stay on your device, separate from what you own on League.</p></article>
     </section>
     <section id="install" class="privacy-section" aria-labelledby="install-title">
       <div class="wrap info-section">
@@ -45,12 +45,14 @@
     </section>
     <section id="screenshots" class="screens-section" aria-labelledby="screens-title">
       <div class="wrap">
-        <div class="section-heading"><div><p class="eyebrow">A closer look</p><h2 id="screens-title">All about the covers.</h2></div><p>Screenshots are on their way.<br>These spaces are reserved for the app.</p></div>
+        <div class="section-heading"><div><p class="eyebrow">A closer look</p><h2 id="screens-title">All about the covers.</h2></div><p>Your collection, on screen.<br>Tap any screenshot for a closer look.</p></div>
         <div class="gallery">
-          <figure><div class="screenshot-placeholder"><span class="placeholder-tag">Screenshot placeholder</span><span class="placeholder-title">Full-screen slideshow</span><p class="placeholder-note">Gallery view coming soon</p></div><figcaption><span>01</span><div><h3>Let the artwork lead</h3><p>A cover fills the display, with the controls tucked away until you need them.</p></div></figcaption></figure>
-          <figure><div class="screenshot-placeholder"><span class="placeholder-tag">Screenshot placeholder</span><span class="placeholder-title">Floating controls</span><p class="placeholder-note">Playback view coming soon</p></div><figcaption><span>02</span><div><h3>Take control with a tap</h3><p>Show the title, skip a cover, pause the slideshow, or open its options.</p></div></figcaption></figure>
-          <figure><div class="screenshot-placeholder"><span class="placeholder-tag">Screenshot placeholder</span><span class="placeholder-title">Slideshow settings</span><p class="placeholder-note">Settings view coming soon</p></div><figcaption><span>03</span><div><h3>Make it your gallery</h3><p>Set the image limit, selection, playback order, timing, and transitions.</p></div></figcaption></figure>
-          <figure><div class="screenshot-placeholder"><span class="placeholder-tag">Screenshot placeholder</span><span class="placeholder-title">Collection checklist</span><p class="placeholder-note">Collection view coming soon</p></div><figcaption><span>04</span><div><h3>Choose what’s on display</h3><p>Enable or exclude issues without changing your collection on League.</p></div></figcaption></figure>
+          <figure><a href="assets/monstress.png" aria-label="View full-size Monstress screenshot"><img src="assets/monstress.png" alt="Monstress #47 displayed in Rogues Gallery, with the title and floating playback controls" width="800" height="1280" loading="lazy"></a><figcaption><span>01</span><div><h3>Monstress</h3><p>Give the artwork room, with controls waiting just a tap away.</p></div></figcaption></figure>
+          <figure><a href="assets/saga.png" aria-label="View full-size Saga screenshot"><img src="assets/saga.png" alt="Saga #57 displayed in Rogues Gallery while the slideshow is playing" width="800" height="1280" loading="lazy"></a><figcaption><span>02</span><div><h3>Saga</h3><p>Let the slideshow play, or pause to enjoy a favourite cover.</p></div></figcaption></figure>
+          <figure><a href="assets/gambit.png" aria-label="View full-size Gambit screenshot"><img src="assets/gambit.png" alt="Gambit Gone #1, Meghan Hetrick variant, displayed with paused slideshow controls" width="800" height="1280" loading="lazy"></a><figcaption><span>03</span><div><h3>Gambit Gone</h3><p>Individual issues and variants each get their own place in the gallery.</p></div></figcaption></figure>
+          <figure><a href="assets/2000ad.png" aria-label="View full-size 2000 AD screenshot"><img src="assets/2000ad.png" alt="Free Comic Book Day 2025: Best of 2000 AD #1 displayed with floating controls" width="800" height="1280" loading="lazy"></a><figcaption><span>04</span><div><h3>Best of 2000 AD</h3><p>Move through your collection with the previous and next controls.</p></div></figcaption></figure>
+          <figure><a href="assets/star-trek.png" aria-label="View full-size Star Trek screenshot"><img src="assets/star-trek.png" alt="Star Trek: Day of Blood — Shaxs’ Best Day #1 displayed in Rogues Gallery" width="800" height="1280" loading="lazy"></a><figcaption><span>05</span><div><h3>Shaxs’ Best Day</h3><p>The issue title and your place in the slideshow float over the artwork.</p></div></figcaption></figure>
+          <figure><a href="assets/wonder-woman.png" aria-label="View full-size Wonder Woman screenshot"><img src="assets/wonder-woman.png" alt="Absolute Wonder Woman #22 displayed with play, previous, next, and options controls" width="800" height="1280" loading="lazy"></a><figcaption><span>06</span><div><h3>Absolute Wonder Woman</h3><p>Tap the three-dot menu to adjust settings or exclude a cover.</p></div></figcaption></figure>
         </div>
       </div>
     </section>
@@ -67,5 +69,6 @@
     <section class="closing wrap"><div><p class="eyebrow">Built for the collection</p><h2>Bring your covers<br>back into view.</h2></div><div><p>A shelf of comics can be a gallery, even when the shelf is a storage box. Follow Rogues Gallery as it gets ready for release.</p><a class="button secondary" href="https://github.com/erickolb/LCGRoguesGallery">Explore on GitHub <span aria-hidden="true">↗</span></a></div></section>
   </main>
   <footer class="wrap"><div class="footer-top"><a class="brand" href="./"><span class="brand-icon"><img src="comic-book.png" width="24" height="24" alt=""></span><span>Rogues Gallery</span></a><span>Out of the boxes. Onto the screen.</span></div><div class="footer-links"><a href="https://github.com/erickolb/LCGRoguesGallery/issues">Report a problem</a><a href="https://github.com/erickolb/LCGRoguesGallery/blob/main/CHANGELOG.md">Changelog</a><a href="privacy.html">Privacy policy</a></div><p class="fine-print">Rogues Gallery is independent and is not affiliated with, endorsed by, or sponsored by League of Comic Geeks. League of Comic Geeks and comic cover artwork belong to their respective owners.</p><p class="fine-print">App icon: <a href="https://www.flaticon.com/free-icons/comic-book" title="comic-book icons">Comic-book icons created by Magnific - Flaticon</a></p><p class="fine-print">Collection adapter based on <a href="https://github.com/alistairjcbrown/leagueofcomicgeeks">leagueofcomicgeeks by Alistair Brown</a>, under the MIT license.</p></footer>
+  <dialog class="screenshot-viewer" aria-label="Full-size app screenshot"><button class="screenshot-close" type="button" aria-label="Close screenshot" autofocus>×</button><img class="screenshot-full" alt=""></dialog>
 </body>
 </html>

@@ -29,3 +29,6 @@
 .policy{max-width:800px;padding-block:64px}.policy h1{font-size:clamp(2.5rem,5vw,4rem);letter-spacing:-2px}.policy h2{font-size:25px;margin:36px 0 14px}.policy h3{font-size:20px;margin:28px 0 12px}.policy p{color:var(--muted);margin-top:16px}.policy a{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:900px){.hero{grid-template-columns:1fr;gap:40px}.hero-copy{max-width:720px}.hero-preview{max-width:700px;width:100%}.preview-frame{transform:none}}
 @media(max-width:560px){.hero h1{font-size:3.2rem}.hero{padding-bottom:40px}.brand{font-size:18px}.brand-icon{width:36px;height:36px}.header nav{gap:12px}.header nav a:nth-child(4){display:inline}.header nav a:last-child{display:none}.screenshot-placeholder{padding:14px;gap:12px}.gallery .placeholder-title{font-size:13px}.gallery .placeholder-note{font-size:11px}.gallery .placeholder-tag{font-size:9px;letter-spacing:1px}.preview-caption{font-size:9px;letter-spacing:.8px}}
+.at-home-photo{width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:900px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}

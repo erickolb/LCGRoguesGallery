@@ -59,6 +59,6 @@ League of Comic Geeks and comic cover artwork belong to their respective owners.
 
 The public website is [erickolb.github.io/LCGRoguesGallery](https://erickolb.github.io/LCGRoguesGallery/). GitHub Pages publishes the static files in `docs/` from `main`; no Node build, backend, or container is needed.
 
-The site follows Cogsworth's layout with LCG navy `#101F3E`, feature descriptions, setup, privacy, and credits. The hero and four app views contain explicit screenshot placeholders. Replace each `.screenshot-placeholder` in `docs/index.html` with a real screenshot image and descriptive alt text when screenshots are ready.
+The site follows Cogsworth's layout with LCG navy `#101F3E`, feature descriptions, setup, privacy, and credits. The main photo and six app screenshots are stored in `docs/assets/`. Screenshots open in a full-size viewer; each has descriptive alt text.
 
 Before the first release, replace the coming-soon download area with the real release APK link and installation instructions. Keep the policy in `docs/privacy.html` and the app's `android/app/src/main/assets/privacy.html` consistent when changing data practices. Push website changes to `main` to update GitHub Pages.
