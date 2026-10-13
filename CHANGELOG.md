@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add automated signed APK/App Bundle builds with certificate checks and checksums; matching version tags publish releases, while manual runs only save artifacts.
+
 - Rename the project and repository links to Rogues Gallery / RoguesGallery.
 - Change the Android application ID and namespace to `net.chateaulore.roguesgallery`.
 - Android treats this as a separate app from the earlier application ID; local settings and sign-in sessions do not transfer.

@@ -43,7 +43,7 @@ Install JDK 17 or newer and Android SDK 37, set `JAVA_HOME` and `ANDROID_HOME`, 
 .\android\gradlew.bat -p android :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-Debug APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Debug signing is for development. Production signing and Play Store publication are not configured.
+Debug APK: `android/app/build/outputs/apk/debug/app-debug.apk`. Debug signing is for development. The **Signed Android release** workflow builds release-signed APKs and Android App Bundles using GitHub secrets. See [signed build and release instructions](RELEASING.md). Play Store publication is not automated.
 
 ## Credits
 
