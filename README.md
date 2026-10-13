@@ -2,6 +2,8 @@
 
 An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `LCGRoguesGallery`.
 
+Current release candidate: **1.0-rc1**, based on the approved 0.2.3 build.
+
 ## Use
 
 1. Sign in on League's own HTTPS page inside the app.

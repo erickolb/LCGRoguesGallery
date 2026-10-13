@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0-rc1 — 2026-10-13
+
+- Label the approved 0.2.3 feature set as the first 1.0 release candidate.
+- Increase Android versionCode to 10; no application behavior changes.
+
 ## 0.2.3 — 2026-10-13
 
 - Open the slideshow with title and controls hidden for a full-size presentation.

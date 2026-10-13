@@ -6,8 +6,8 @@ android {
         applicationId = "net.chateaulore.lcgroguesgallery"
         minSdk = 26
         targetSdk = 37
-        versionCode = 9
-        versionName = "0.2.3"
+        versionCode = 10
+        versionName = "1.0-rc1"
     }
 }
 dependencies { testImplementation("junit:junit:4.13.2") }
