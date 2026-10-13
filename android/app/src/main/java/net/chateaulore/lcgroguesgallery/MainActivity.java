@@ -26,7 +26,13 @@ public class MainActivity extends Activity {
     private boolean playing, importing;
     private Bitmap currentBitmap;
     private final Runnable slideshow = new Runnable() { public void run() { if (playing) { advance(1); handler.postDelayed(this,15000); } } };
-    @Override public void onCreate(Bundle state) { super.onCreate(state); createWebView(); showLogin(); }
+    @Override public void onCreate(Bundle state) { super.onCreate(state); createWebView(); showLogin(); if(Build.VERSION.SDK_INT>=33) ModernBack.register(this,this::handleBack); }
+    @android.annotation.TargetApi(33)
+    private static class ModernBack {
+        static void register(Activity activity, Runnable action) {
+            activity.getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,action::run);
+        }
+    }
     private void createWebView() {
         league = new WebView(this);
         league.getSettings().setJavaScriptEnabled(true);
@@ -38,7 +44,7 @@ public class MainActivity extends Activity {
         league.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                return !LeagueOrigin.accepts(uri.toString());
+                return request.isForMainFrame() && !LeagueOrigin.accepts(uri.toString());
             }
             @Override public void onPageFinished(WebView view, String url) { CookieManager.getInstance().flush(); }
             @Override public void onReceivedSslError(WebView view, android.webkit.SslErrorHandler handler, android.net.http.SslError error) { handler.cancel(); }
@@ -142,7 +148,10 @@ public class MainActivity extends Activity {
     private void credits(){String license="";try(InputStream in=getAssets().open("leagueofcomicgeeks-LICENSE.txt")){license=new String(readBytes(in),java.nio.charset.StandardCharsets.UTF_8);}catch(IOException ignored){}
         TextView t=new TextView(this);t.setPadding(28,20,28,20);t.setText(android.text.Html.fromHtml("<h2>Credits</h2><p><a href=\"https://www.flaticon.com/free-icons/comic-book\" title=\"comic-book icons\">Comic-book icons created by Magnific - Flaticon</a></p><p>Collection adapter based on <a href=\"https://github.com/alistairjcbrown/leagueofcomicgeeks\">leagueofcomicgeeks by Alistair Brown</a> (MIT).</p><p>Unofficial app. League of Comic Geeks and cover artwork belong to their respective owners.</p>",0));t.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
         ScrollView scroll=new ScrollView(this);LinearLayout content=new LinearLayout(this);content.setOrientation(1);content.addView(t);TextView l=new TextView(this);l.setPadding(28,0,28,20);l.setText(license);content.addView(l);scroll.addView(content);new AlertDialog.Builder(this).setView(scroll).setPositiveButton("Close",null).show();}
-    @Override public void onBackPressed(){if(collection.length()>0)menu();else if(league.canGoBack())league.goBack();else super.onBackPressed();}
+    private void handleBack(){if(cover!=null && cover.getParent()==root)menu();else if(league.canGoBack())league.goBack();else finish();}
+    // API 33+ uses ModernBack; this callback supports Android 8 through 12.
+    @android.annotation.SuppressLint("GestureBackNavigation")
+    @Override public void onBackPressed(){handleBack();}
     @Override protected void onPause(){super.onPause();stopPlayback();CookieManager.getInstance().flush();}
     @Override protected void onResume(){super.onResume();if(cover!=null && cover.getParent()==root){getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(5894);}}
     @Override protected void onDestroy(){generation++;importing=false;handler.removeCallbacksAndMessages(null);images.shutdownNow();league.destroy();super.onDestroy();}
