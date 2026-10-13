@@ -1,4 +1,4 @@
-package net.chateaulore.lcgroguesgallery;
+package net.chateaulore.roguesgallery;
 
 import android.content.SharedPreferences;
 import org.json.JSONArray;

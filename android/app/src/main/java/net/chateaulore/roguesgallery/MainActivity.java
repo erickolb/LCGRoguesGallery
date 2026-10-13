@@ -1,4 +1,4 @@
-package net.chateaulore.lcgroguesgallery;
+package net.chateaulore.roguesgallery;
 
 import android.app.*;
 import android.animation.*;

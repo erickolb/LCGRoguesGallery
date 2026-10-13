@@ -1,4 +1,4 @@
-package net.chateaulore.lcgroguesgallery;
+package net.chateaulore.roguesgallery;
 import java.net.URI;
 final class LeagueOrigin {
     static boolean accepts(String url) {

@@ -1,4 +1,4 @@
-package net.chateaulore.lcgroguesgallery;
+package net.chateaulore.roguesgallery;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

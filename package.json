@@ -1,5 +1,5 @@
 {
-  "name": "lcg-rogues-gallery-adapter-tests",
+  "name": "rogues-gallery-adapter-tests",
   "private": true,
   "scripts": { "test": "node --test test/*.test.cjs" },
   "devDependencies": { "linkedom": "^0.18.12" }

@@ -1,6 +1,6 @@
-# LCG Rogues Gallery
+# Rogues Gallery
 
-An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `LCGRoguesGallery`.
+An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `RoguesGallery`.
 
 Current release candidate: **1.0-rc1**, based on the approved 0.2.3 build.
 
@@ -57,7 +57,7 @@ League of Comic Geeks and comic cover artwork belong to their respective owners.
 
 ## Website
 
-The public website is [erickolb.github.io/LCGRoguesGallery](https://erickolb.github.io/LCGRoguesGallery/). GitHub Pages publishes the static files in `docs/` from `main`; no Node build, backend, or container is needed.
+The public website is [erickolb.github.io/RoguesGallery](https://erickolb.github.io/RoguesGallery/). GitHub Pages publishes the static files in `docs/` from `main`; no Node build, backend, or container is needed.
 
 The site follows Cogsworth's layout with LCG navy `#101F3E`, feature descriptions, setup, privacy, and credits. The main photo and six app screenshots are stored in `docs/assets/`. Screenshots open in a full-size viewer; each has descriptive alt text.
 

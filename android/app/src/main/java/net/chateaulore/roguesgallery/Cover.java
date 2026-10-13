@@ -1,4 +1,4 @@
-package net.chateaulore.lcgroguesgallery;
+package net.chateaulore.roguesgallery;
 
 final class Cover {
     final String id;

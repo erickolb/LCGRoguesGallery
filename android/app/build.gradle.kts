@@ -1,9 +1,9 @@
 plugins { id("com.android.application") }
 android {
-    namespace = "net.chateaulore.lcgroguesgallery"
+    namespace = "net.chateaulore.roguesgallery"
     compileSdk = 37
     defaultConfig {
-        applicationId = "net.chateaulore.lcgroguesgallery"
+        applicationId = "net.chateaulore.roguesgallery"
         minSdk = 26
         targetSdk = 37
         versionCode = 10

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Rename the project and repository links to Rogues Gallery / RoguesGallery.
+- Change the Android application ID and namespace to `net.chateaulore.roguesgallery`.
+- Android treats this as a separate app from the earlier application ID; local settings and sign-in sessions do not transfer.
+
 ## 1.0-rc1 — 2026-10-13
 
 - Label the approved 0.2.3 feature set as the first 1.0 release candidate.
