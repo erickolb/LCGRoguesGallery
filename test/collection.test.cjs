@@ -5,6 +5,20 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const script = fs.readFileSync('android/app/src/main/assets/collection.js','utf8');
 const row = (id,variant='',image='/images/comics/1-cover.jpg') => `<li><div class="comic-title"><a href="/comic/${id}/title${variant}">Title ${id}</a></div><div class="comic-cover-art"><img data-original="${image}"></div></li>`;
+test('a slow older import cannot overwrite a newer collection',async()=>{
+  let finishFirst,calls=0;
+  const context={window:{},document:{documentElement:{innerHTML:'user_id: 42'}},DOMParser,URL,URLSearchParams,location:{origin:'https://leagueofcomicgeeks.com'},fetch:async()=>{
+    const call=++calls;
+    if(call===1)await new Promise(resolve=>{finishFirst=resolve;});
+    return {ok:true,json:async()=>({list:row(call)})};
+  }};
+  const first=vm.runInNewContext(script,context);
+  await vm.runInNewContext(script,context);
+  const latest=context.window.__roguesResult;
+  finishFirst();await first;
+  assert.strictEqual(context.window.__roguesResult,latest);
+  assert.equal(latest.covers[0].id,'2:');
+});
 async function run(responses,html='user_id: 42') {
   const calls=[];
   const context={window:{},document:{documentElement:{innerHTML:html}},DOMParser,URL,URLSearchParams,location:{origin:'https://leagueofcomicgeeks.com'},fetch:async url=>{calls.push(url); const response=responses.shift(); if(!response)throw new Error('Unexpected extra request'); return {ok:true,json:async()=>response,text:async()=>response};}};

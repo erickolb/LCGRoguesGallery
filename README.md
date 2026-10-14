@@ -2,7 +2,7 @@
 
 An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `RoguesGallery`.
 
-Current release: **1.0**. [Download the signed APK](https://github.com/erickolb/RoguesGallery/releases/latest/download/RoguesGallery.apk).
+Current release: **1.0.1**. [Download the signed APK](https://github.com/erickolb/RoguesGallery/releases/latest/download/RoguesGallery.apk).
 
 ## Use
 
@@ -20,6 +20,8 @@ The app lists the full Have It collection before choosing covers. The maximum de
 Each new session chooses a fresh selection by default. Enable **Keep the same selection between sessions** to retain eligible issue/variant references and fill gaps when comics are removed or excluded. Exclusions and saved selections are separated by LCG account. Refreshing the collection also makes a fresh selection when persistence is off.
 
 Settings also controls the delay between covers: **3–600 seconds**, default **15**. **Cross-fade between covers** defaults on; turn it off for an instant smash cut. The current cover stays visible while the next loads. Slideshow controls form a compact, centered row with matching button heights.
+
+After every **12 hours of active playback**, the app refreshes issue data in the background and applies the current settings and exclusions. Saved selection mode keeps eligible selected issues; fresh selection mode samples again. The gallery stays visible. If loading fails or the session expires, existing covers remain and the app retries after 15 more minutes of playback. Paused time and time outside the app do not count toward these intervals.
 
 In the cover Menu, **Exclude this cover** removes it and fills the open slot. **Manage collection** lists the full imported collection without downloading extra covers. Check or uncheck issues to enable or exclude them, then tap Done. Enabled issues remain subject to the configured maximum.
 

@@ -36,6 +36,12 @@ public class MainActivity extends Activity {
     private int index, polls;
     private volatile int generation;
     private boolean playing, importing, loadingCover;
+    private final RefreshSchedule refreshSchedule = new RefreshSchedule();
+    private final Runnable pollCollection = this::pollImport;
+    private boolean backgroundImport;
+    private int importGeneration;
+    private String refreshAccount;
+    private final Runnable refreshCollection = ()->{if(playing && inGallery())importCollection(true);};
     private Bitmap currentBitmap;
     private final Runnable slideshow = ()->{if(playing)advance(1);};
     @Override public void onCreate(Bundle state) { super.onCreate(state); preferences=new GalleryPreferences(getSharedPreferences("gallery",MODE_PRIVATE)); cache=new CoverCache(new File(getCacheDir(),"covers")); createWebView(); showLogin(); if(Build.VERSION.SDK_INT>=33) ModernBack.register(this,this::handleBack); }
@@ -74,6 +80,7 @@ public class MainActivity extends Activity {
     private Button button(String label, Runnable action) { Button b = new Button(this); b.setText(label); b.setOnClickListener(v -> action.run()); return b; }
     private void text(String value) { TextView t = new TextView(this); t.setText(value); t.setTextColor(Color.WHITE); t.setPadding(20,12,20,12); root.addView(t); }
     private void showLogin() {
+        cancelImport();
         stopPlayback(); generation++; managing=false; base();
         text("Legion of Comic Geeks - Rogues Gallery is an unaffiliated app that will allow you to display issues in your collection as a slideshow on your device. To begin, sign into to LCG, then open your own profile collection and tap the Load My Collection button.");
         LinearLayout row = new LinearLayout(this);
@@ -86,36 +93,50 @@ public class MainActivity extends Activity {
         if (league.getUrl() == null) league.loadUrl("https://leagueofcomicgeeks.com/login");
     }
     private void importCollection() {
+        importCollection(false);
+    }
+    private void importCollection(boolean background) {
         if (importing) return;
-        if (!LeagueOrigin.accepts(league.getUrl())) { status.setText("Open League before loading your collection."); return; }
+        backgroundImport=background;refreshAccount=account;
+        if (!LeagueOrigin.accepts(league.getUrl())) { importFailed("Open League before loading your collection."); return; }
         try {
             String script;
             try (InputStream in = getAssets().open("collection.js")) { script = new String(readBytes(in), java.nio.charset.StandardCharsets.UTF_8); }
-            importing = true; polls=0; status.setText("Listing your full collection…");
-            league.evaluateJavascript(script, ignored -> handler.postDelayed(this::pollImport,1000));
-        } catch(Exception e) { status.setText("Could not start import."); }
+            importing = true; polls=0; int token=++importGeneration;
+            if(!background)status.setText("Listing your full collection…");
+            league.evaluateJavascript(script, ignored -> {if(token==importGeneration && importing)handler.postDelayed(pollCollection,1000);});
+        } catch(Exception e) { importFailed("Could not start import."); }
+    }
+    private void cancelImport(){if(importing)league.evaluateJavascript("window.__roguesRun=(window.__roguesRun||0)+1",null);importing=false;importGeneration++;handler.removeCallbacks(pollCollection);}
+    private void scheduleRefresh(){handler.removeCallbacks(refreshCollection);if(playing && !importing && !account.isEmpty())handler.postDelayed(refreshCollection,refreshSchedule.delay(SystemClock.elapsedRealtime()));}
+    private void importFailed(String message){
+        importing=false;
+        if(backgroundImport){refreshSchedule.failed(SystemClock.elapsedRealtime());scheduleRefresh();}
+        else status.setText(message);
     }
     private void pollImport() {
         if (!importing) return;
+        int token=importGeneration;
         league.evaluateJavascript("JSON.stringify(window.__roguesResult || {progress:window.__roguesProgress || 'Loading owned issues…'})", value -> {
+            if(token!=importGeneration || !importing)return;
             try {
                 Object decoded = new JSONTokener(value).nextValue();
                 if (!(decoded instanceof String) || "null".equals(decoded)) {
-                    if (++polls < 600) handler.postDelayed(this::pollImport,1000);
-                    else { importing=false; status.setText("Collection loading timed out. Please try again."); }
+                    if (++polls < 600) handler.postDelayed(pollCollection,1000);
+                    else importFailed("Collection loading timed out. Please try again.");
                     return;
                 }
                 JSONObject result = new JSONObject((String)decoded);
                 if (result.has("progress")) {
-                    status.setText(result.getString("progress"));
-                    if (++polls < 600) handler.postDelayed(this::pollImport,1000);
-                    else { importing=false; status.setText("Collection loading timed out. Please try again."); }
+                    if(!backgroundImport)status.setText(result.getString("progress"));
+                    if (++polls < 600) handler.postDelayed(pollCollection,1000);
+                    else importFailed("Collection loading timed out. Please try again.");
                     return;
                 }
                 importing=false;
-                if (result.has("error")) { status.setText(result.getString("error")); return; }
+                if (result.has("error")) { importFailed(result.getString("error")); return; }
                 acceptCollection(result);
-            } catch(Exception e) { importing=false; status.setText("Unable to read League's response. Try signing in again."); }
+            } catch(Exception e) { importFailed("Unable to read League's response. Try signing in again."); }
         });
     }
     private void showGallery() {
@@ -161,6 +182,7 @@ public class MainActivity extends Activity {
     private void scheduleRotation(){handler.removeCallbacks(slideshow);if(playing && !loadingCover)handler.postDelayed(slideshow,preferences.rotationSeconds*1000L);}
     private void setPlaying(boolean requested){
         playing=requested && !collection.isEmpty();handler.removeCallbacks(slideshow);
+        refreshSchedule.running(SystemClock.elapsedRealtime(),playing);scheduleRefresh();
         if(playbackButton!=null){
             playbackButton.setText(playing?"Pause":"Play");
             playbackButton.setContentDescription(playing?"Pause slideshow":"Play slideshow");
@@ -211,14 +233,27 @@ public class MainActivity extends Activity {
             animation.start();
         }else if(outgoing!=null)outgoing.recycle();
     }
-    private void stopPlayback(){setPlaying(false);finishTransition();getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
+    private void stopPlayback(){if(backgroundImport && importing){cancelImport();refreshSchedule.failed(SystemClock.elapsedRealtime());}setPlaying(false);finishTransition();getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
     private void acceptCollection(JSONObject result) throws JSONException {
-        account=result.getString("accountId"); fullCollection.clear();unavailable.clear();
+        String incomingAccount=result.getString("accountId");
+        if(backgroundImport && (!account.equals(refreshAccount) || !account.equals(incomingAccount)))throw new JSONException("Account changed during refresh");
+        List<Cover> incoming=new ArrayList<>();
         JSONArray covers=result.getJSONArray("covers");
-        for(int i=0;i<covers.length();i++){JSONObject c=covers.getJSONObject(i);fullCollection.add(new Cover(c.getString("id"),c.optString("title"),c.getString("url"),c.optString("fallbackUrl")));}
+        for(int i=0;i<covers.length();i++){JSONObject c=covers.getJSONObject(i);incoming.add(new Cover(c.getString("id"),c.optString("title"),c.getString("url"),c.optString("fallbackUrl")));}
+        String currentId=collection.isEmpty()?null:collection.get(index).id;
+        List<String> previous=backgroundImport?CollectionSelection.ids(selected):preferences.selected(incomingAccount);
+        account=incomingAccount;fullCollection.clear();fullCollection.addAll(incoming);unavailable.clear();
         excluded=preferences.exclusions(account);
-        select(preferences.selected(account),preferences.rememberSelection);
-        showGallery();
+        select(previous,preferences.rememberSelection);
+        refreshSchedule.refreshed(SystemClock.elapsedRealtime());
+        if(backgroundImport){
+            if(inGallery()){
+                int retained=-1;for(int i=0;i<collection.size();i++)if(collection.get(i).id.equals(currentId)){retained=i;break;}
+                if(retained>=0){index=retained;caption.setText(collection.get(index).title+" · "+(index+1)+" / "+collection.size());}
+                else display();
+            }
+            scheduleRefresh();
+        }else showGallery();
     }
     private void select(List<String> previous,boolean keep) {
         Set<String> ineligible=new HashSet<>(excluded);ineligible.addAll(unavailable);

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 — 2026-10-14
+
+- Refresh collection issue data in the background after every 12 hours of active slideshow playback.
+- Reapply current selection settings and account-specific exclusions without leaving the gallery.
+- Keep existing covers if refreshing fails; retry after 15 more minutes of playback.
+- Pausing the slideshow or leaving the app pauses the refresh clock.
+
 ## 1.0 — 2026-10-13
 
 - First public release of Rogues Gallery for Android 8.0 and newer.

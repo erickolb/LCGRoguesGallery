@@ -1,4 +1,5 @@
 (async () => {
+  const run = window.__roguesRun = (window.__roguesRun || 0) + 1;
   window.__roguesResult = null;
   window.__roguesProgress = 'Loading owned issues…';
   try {
@@ -78,6 +79,7 @@
 
     await readCollection(null);
     for (const entry of series.values()) {
+      if (window.__roguesRun !== run) return;
       window.__roguesProgress = 'Loading series ' + (finishedSeries + 1) + ' / ' + series.size + ' · ' + covers.length + ' issue covers';
       const issues = await readCollection(entry);
       if (!issues) {
@@ -96,6 +98,6 @@
       finishedSeries++;
     }
     if (!covers.length) throw new Error('No owned issue covers were returned. Open your collection and try again.');
-    window.__roguesResult = {accountId:idMatch[1],covers};
-  } catch (error) { window.__roguesResult = {error: error.message || 'Collection request failed.'}; }
+    if (window.__roguesRun === run) window.__roguesResult = {accountId:idMatch[1],covers};
+  } catch (error) { if (window.__roguesRun === run) window.__roguesResult = {error: error.message || 'Collection request failed.'}; }
 })();
